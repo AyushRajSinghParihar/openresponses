@@ -140,50 +140,88 @@ export async function parseSSEStream(
 
   const decoder = new TextDecoder();
   let buffer = "";
+  let eventName = "";
+  let dataLines: string[] = [];
+  let finished = false;
+  let skipLF = false;
+
+  const processLine = (line: string) => {
+    if (line !== "") {
+      const colon = line.indexOf(":");
+      const field = colon === -1 ? line : line.slice(0, colon);
+      let value = colon === -1 ? "" : line.slice(colon + 1);
+      if (value.startsWith(" ")) value = value.slice(1);
+      if (field === "event") eventName = value;
+      if (field === "data") dataLines.push(value);
+      return;
+    }
+
+    if (dataLines.length === 0) {
+      eventName = "";
+      return;
+    }
+    const data = dataLines.join("\n");
+    const name = eventName;
+    eventName = "";
+    dataLines = [];
+    if (data === "[DONE]") {
+      finished = true;
+      if (!finalResponse) {
+        errors.push("Received [DONE] before a terminal response event");
+      }
+      return;
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(data);
+    } catch {
+      errors.push(`Failed to parse event data: ${data}`);
+      return;
+    }
+    const parsedEvent = parseStreamingEventData(parsed, name);
+    events.push(parsedEvent);
+    if (!parsedEvent.validationResult.success) {
+      errors.push(
+        `Event validation failed for ${parsedEvent.event}: ${JSON.stringify(parsedEvent.validationResult.error.issues)}`,
+      );
+    }
+    finalResponse = getTerminalResponse(parsed) ?? finalResponse;
+  };
+
+  const processBuffer = () => {
+    while (!finished) {
+      if (skipLF && buffer.length > 0) {
+        skipLF = false;
+        if (buffer.startsWith("\n")) buffer = buffer.slice(1);
+      }
+      const end = buffer.search(/[\r\n]/);
+      if (end === -1) break;
+      const line = buffer.slice(0, end);
+      skipLF = buffer[end] === "\r";
+      buffer = buffer.slice(end + 1);
+      processLine(line);
+    }
+  };
 
   try {
-    while (true) {
+    while (!finished) {
       const { done, value } = await reader.read();
+      buffer += decoder.decode(value, { stream: !done });
+      processBuffer();
       if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() || "";
-
-      let currentEvent = "";
-      let currentData = "";
-
-      for (const line of lines) {
-        if (line.startsWith("event:")) {
-          currentEvent = line.slice(6).trim();
-        } else if (line.startsWith("data:")) {
-          currentData = line.slice(5).trim();
-        } else if (line === "" && currentData) {
-          if (currentData === "[DONE]") {
-            // Skip the [DONE] sentinel - it's not a real event
-          } else {
-            try {
-              const parsed = JSON.parse(currentData);
-              const parsedEvent = parseStreamingEventData(parsed, currentEvent);
-              events.push(parsedEvent);
-
-              if (!parsedEvent.validationResult.success) {
-                errors.push(
-                  `Event validation failed for ${parsedEvent.event}: ${JSON.stringify(parsedEvent.validationResult.error.issues)}`,
-                );
-              }
-
-              finalResponse = getTerminalResponse(parsed) ?? finalResponse;
-            } catch {
-              errors.push(`Failed to parse event data: ${currentData}`);
-            }
-          }
-          currentEvent = "";
-          currentData = "";
-        }
-      }
     }
+    if (!finished) errors.push("Stream ended before [DONE]");
+  } catch (error) {
+    errors.push(
+      `Failed to read event stream: ${error instanceof Error ? error.message : String(error)}`,
+    );
   } finally {
+    try {
+      await reader.cancel();
+    } catch {
+      // An errored stream may also reject cancellation.
+    }
     reader.releaseLock();
   }
 

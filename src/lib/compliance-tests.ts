@@ -38,6 +38,7 @@ export interface TestConfig {
   useBearerPrefix: boolean;
   model: string;
   runtime?: "browser" | "server";
+  timeoutMs?: number;
 }
 
 export interface TestResult {
@@ -674,25 +675,46 @@ export const testTemplates: TestTemplate[] = [
 async function makeRequest(
   config: TestConfig,
   endpoint: string,
-  body: TestRequestBody,
+  body: Record<string, unknown>,
   streaming = false,
-): Promise<Response> {
+): Promise<{
+  response: Response;
+  rawData: unknown;
+  sseResult?: SSEParseResult;
+}> {
   const authValue = config.useBearerPrefix
     ? `Bearer ${config.apiKey}`
     : config.apiKey;
+  const controller = new AbortController();
+  const timeout = setTimeout(
+    () => controller.abort(new Error(`HTTP request to ${endpoint} timed out`)),
+    config.timeoutMs ?? 30000,
+  );
 
-  return fetch(`${config.baseUrl.replace(/\/$/, "")}${endpoint}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      [config.authHeaderName]: authValue,
-    },
-    body: JSON.stringify(
-      streaming && body && typeof body === "object" && !Array.isArray(body)
-        ? { ...body, stream: true }
-        : body,
-    ),
-  });
+  try {
+    const response = await fetch(
+      `${config.baseUrl.replace(/\/$/, "")}${endpoint}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          [config.authHeaderName]: authValue,
+        },
+        body: JSON.stringify(
+          streaming && body && typeof body === "object" && !Array.isArray(body)
+            ? { ...body, stream: true }
+            : body,
+        ),
+        signal: controller.signal,
+      },
+    );
+    const result = await readResponseBody(response, streaming);
+    controller.signal.throwIfAborted();
+    return { response, ...result };
+  } finally {
+    clearTimeout(timeout);
+    controller.abort();
+  }
 }
 
 function toWebSocketUrl(baseUrl: string) {
@@ -773,14 +795,12 @@ async function makeWebSocketSession(
 
     const currentTurn = () => turns[turnIndex];
 
-    const armTimeout = () => {
+    const armTimeout = (message: string) => {
       clearPendingTimeout();
-      timeout = setTimeout(() => {
-        currentTurn()?.errors.push(
-          "Timed out waiting for terminal WebSocket response event",
-        );
-        finish();
-      }, 30000);
+      timeout = setTimeout(
+        () => fail(new Error(message)),
+        config.timeoutMs ?? 30000,
+      );
     };
 
     const sendCurrentRequest = () => {
@@ -816,8 +836,12 @@ async function makeWebSocketSession(
         }
       }
       turn.request = body;
-      armTimeout();
-      ws.send(JSON.stringify(body));
+      armTimeout("Timed out waiting for terminal WebSocket response event");
+      try {
+        ws.send(JSON.stringify(body));
+      } catch (error) {
+        fail(error instanceof Error ? error : new Error(String(error)));
+      }
     };
 
     const completeCurrentTurn = () => {
@@ -859,11 +883,14 @@ async function makeWebSocketSession(
       return;
     }
 
+    armTimeout("Timed out opening WebSocket connection");
     ws.addEventListener("open", () => {
+      if (settled) return;
       sendCurrentRequest();
     });
 
     ws.addEventListener("message", (message) => {
+      if (settled) return;
       const turn = currentTurn();
       if (!turn) return;
 
@@ -933,24 +960,6 @@ async function makeWebSocketRequest(
 ): Promise<SSEParseResult> {
   const [result] = await makeWebSocketSession(config, [body]);
   return result;
-}
-
-async function makeCompactRequest(
-  config: TestConfig,
-  body: Record<string, unknown>,
-): Promise<Response> {
-  const authValue = config.useBearerPrefix
-    ? `Bearer ${config.apiKey}`
-    : config.apiKey;
-
-  return fetch(`${config.baseUrl.replace(/\/$/, "")}/responses/compact`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      [config.authHeaderName]: authValue,
-    },
-    body: JSON.stringify(body),
-  });
 }
 
 async function readResponseBody(
@@ -1498,8 +1507,8 @@ async function runWebSocketCompactNewChainTest(
   };
 
   try {
-    const compactResponse = await makeCompactRequest(config, compactRequest);
-    const { rawData: compactBody } = await readResponseBody(compactResponse);
+    const { response: compactResponse, rawData: compactBody } =
+      await makeRequest(config, "/responses/compact", compactRequest);
     if (!compactResponse.ok) {
       return {
         id: template.id,
@@ -1686,14 +1695,13 @@ async function runTest(
       };
     }
 
-    const response = await makeRequest(
+    const { response, rawData, sseResult } = await makeRequest(
       config,
       endpoint,
       requestBody,
       streaming,
     );
     const duration = Date.now() - startTime;
-    const { rawData, sseResult } = await readResponseBody(response, streaming);
 
     if (!expectedStatuses.includes(response.status)) {
       return {
@@ -1736,28 +1744,38 @@ export async function runAllTests(
   templates = testTemplates,
 ): Promise<TestResult[]> {
   const promises = templates.map(async (template) => {
-    const unsupportedReason = template.unsupportedReason?.(config);
-    if (unsupportedReason) {
-      const result: TestResult = {
+    const startTime = Date.now();
+    let result: TestResult;
+    try {
+      const unsupportedReason = template.unsupportedReason?.(config);
+      if (unsupportedReason) {
+        result = {
+          id: template.id,
+          name: template.name,
+          description: template.description,
+          status: "skipped",
+          duration: 0,
+          errors: [unsupportedReason],
+        };
+      } else {
+        onProgress({
+          id: template.id,
+          name: template.name,
+          description: template.description,
+          status: "running",
+        });
+        result = await runTest(template, config);
+      }
+    } catch (error) {
+      result = {
         id: template.id,
         name: template.name,
         description: template.description,
-        status: "skipped",
-        duration: 0,
-        errors: [unsupportedReason],
+        status: "failed",
+        duration: Date.now() - startTime,
+        errors: [error instanceof Error ? error.message : String(error)],
       };
-      onProgress(result);
-      return result;
     }
-
-    onProgress({
-      id: template.id,
-      name: template.name,
-      description: template.description,
-      status: "running",
-    });
-
-    const result = await runTest(template, config);
     onProgress(result);
     return result;
   });
