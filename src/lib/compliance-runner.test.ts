@@ -110,7 +110,7 @@ describe("HTTP request deadlines", () => {
     2000,
   );
 
-  test("a terminal SSE response without DONE cannot hang or pass", async () => {
+  test("a terminal SSE response that never closes times out", async () => {
     let cancel!: () => void;
     const cancelled = new Promise<void>((resolve) => {
       cancel = resolve;

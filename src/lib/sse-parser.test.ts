@@ -96,13 +96,32 @@ describe("SSE response parsing", () => {
     }
   });
 
-  it("fails streams missing their terminal response or DONE marker", async () => {
+  it("accepts each terminal response with or without DONE", async () => {
+    for (const status of ["completed", "failed", "incomplete"]) {
+      const event = {
+        type: `response.${status}`,
+        sequence_number: 1,
+        response: { ...responseFixture, status },
+      };
+      const terminalFrame = `event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`;
+      for (const suffix of ["", "data: [DONE]\n\n", ": connection closed"]) {
+        const result = await parse(terminalFrame + suffix);
+        expect(result.errors).toEqual([]);
+        expect(result.events.map((entry) => entry.data)).toEqual([event]);
+        expect(result.finalResponse).toEqual(event.response);
+      }
+    }
+  });
+
+  it("fails streams missing their terminal response or ending mid-event", async () => {
     for (const text of [
       "",
       frame(delta),
-      frame(terminal),
+      frame(terminal).slice(0, -1),
       "data: [DONE]\n\n",
       completeStream.slice(0, -1),
+      frame(terminal) + 'data: {"type":',
+      frame(terminal) + "event: response.output_text.delta\n",
     ]) {
       const result = await parse(text);
       expect(result.errors.length).toBeGreaterThan(0);

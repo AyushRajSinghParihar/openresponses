@@ -211,7 +211,13 @@ export async function parseSSEStream(
       processBuffer();
       if (done) break;
     }
-    if (!finished) errors.push("Stream ended before [DONE]");
+    if (!finished) {
+      if (buffer) processLine(buffer);
+      if (dataLines.length > 0 || eventName)
+        errors.push("Stream ended during an SSE event");
+      if (!finalResponse)
+        errors.push("Stream ended before a terminal response event");
+    }
   } catch (error) {
     errors.push(
       `Failed to read event stream: ${error instanceof Error ? error.message : String(error)}`,
