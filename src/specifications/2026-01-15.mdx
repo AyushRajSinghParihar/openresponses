@@ -80,7 +80,7 @@ When not streaming, servers MUST return data only as `application/json`.
 
 **Streaming HTTP Responses**
 
-When streaming, servers MUST return header `Content-Type: text/event-stream` , with individual `data` objects returned as JSON-encoded strings. The terminal event MUST be the literal string `[DONE]`.
+When streaming, servers MUST return header `Content-Type: text/event-stream` , with individual `data` objects returned as JSON-encoded strings. The stream MUST include a terminal response event (`response.completed`, `response.failed`, or `response.incomplete`). Servers MAY send the literal string `[DONE]` after that event. Clients MUST also accept the stream ending after the terminal response event without `[DONE]`.
 
 The `event` field MUST match the `type` in the event body. Servers SHOULD NOT use `id`.
 

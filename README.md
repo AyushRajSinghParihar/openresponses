@@ -56,6 +56,8 @@ python3 -m pytest bin/compare_openapi_test.py bin/typespec_contract_test.py bin/
 
 This repo includes an interactive compliance tester in the docs site (`/compliance`) and a CLI runner for faster local iteration and CI (`bin/compliance-test.ts`).
 
+Each HTTP request, including its response body, has a 30-second deadline. WebSocket connections and individual turns have the same deadline. A timeout fails that test while the other tests continue.
+
 ### Web UI
 
 The interactive compliance tester is available at https://www.openresponses.org/compliance.
