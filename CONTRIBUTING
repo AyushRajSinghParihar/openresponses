@@ -4,27 +4,23 @@ Thanks for helping with Open Responses. This file focuses on how to make proposa
 
 ## Proposals
 
-We keep changes open, neutral, and interoperable, as described in `src/pages/governance.mdx`.
+We keep changes open, neutral, and interoperable, as described in the [technical charter](src/pages/governance.mdx).
 
 ## Maintainers
 
-- Lead Core Maintainer: Steve Coffey, OpenAI
-- Core Maintainers:
-  - Ankit Mathur, Databricks
-  - Anthony Liguori, Amazon
-  - Ben Burtenshaw, HuggingFace
-  - Devon Rifkin, Ollama
-  - Ji Huang, OpenAI
-  - Matt Apperson, OpenRouter
-  - Shaun Smith, HuggingFace
-  - Kedar Thakker, Ramp
+The Maintainers are the initial voting members of the Technical Steering Committee (TSC).
 
-### Lead Core Maintainer selection and removal
+- Steve Coffey, OpenAI
+- Ankit Mathur, Databricks
+- Anthony Liguori, Amazon
+- Ben Burtenshaw, HuggingFace
+- Devon Rifkin, Ollama
+- Ji Huang, OpenAI
+- Matt Apperson, OpenRouter
+- Shaun Smith, HuggingFace
+- Kedar Thakker, Ramp
 
-- The Lead Core Maintainer may be removed by a 75% vote of all Core Maintainers,
-  excluding the incumbent.
-- If the role becomes vacant, Core Maintainers select a replacement using a
-  consensus-seeking or ranked-choice method.
+Maintainer selection and removal follow the technical charter.
 
 ### When to propose
 
@@ -56,8 +52,8 @@ and an entry in `CHANGELOG.md`.
 
 ### How proposals are decided
 
-We seek consensus. If consensus cannot be reached, the TSC resolves the decision per the
-governance charter. The Lead Core Maintainer is the final decision-maker when needed.
+We seek consensus. If consensus cannot be reached, decisions follow the TSC voting
+and escalation procedures in the technical charter.
 
 ### DCO
 
