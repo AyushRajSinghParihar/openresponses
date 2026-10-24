@@ -8,7 +8,11 @@ import { refusalContentParamSchema } from "./refusalContentParamSchema.ts";
 import { z } from "zod";
 
 export const assistantMessageItemParamSchema = z.object({
-  id: z.optional(z.union([z.string(), z.null()])),
+  id: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe("The unique ID of this message item."),
+  ),
   type: z
     .enum(["message"])
     .default("message")
@@ -31,13 +35,15 @@ export const assistantMessageItemParamSchema = z.object({
       ),
       z.string(),
     ])
-    .describe("The message content, as an array of content parts."),
+    .describe("The message content, as a string or an array of content parts."),
   phase: z.optional(
     z
       .enum(["commentary", "final_answer"])
       .describe(
-        "Labels an `assistant` message as intermediate commentary (`commentary`) or the final answer (`final_answer`). For models like `gpt-5.3-codex` and beyond, when sending follow-up requests, preserve and resend phase on all assistant messages. Omitting it can degrade performance. Not used for user messages.",
+        "Labels an `assistant` message as intermediate commentary (`commentary`) or the\nfinal answer (`final_answer`). For models like `gpt-5.3-codex` and beyond, when\nsending follow-up requests, preserve and resend phase on all assistant messages.\nOmitting it can degrade performance. Not used for user messages.",
       ),
   ),
-  status: z.optional(z.union([z.string(), z.null()])),
+  status: z.optional(
+    z.union([z.string(), z.null()]).describe("The status of the message item."),
+  ),
 });

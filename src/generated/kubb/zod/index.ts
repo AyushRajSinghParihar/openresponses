@@ -93,7 +93,6 @@ export { responseRefusalDeltaStreamingEventSchema } from "./responseRefusalDelta
 export { responseRefusalDoneStreamingEventSchema } from "./responseRefusalDoneStreamingEventSchema.ts";
 export { responseResourceSchema } from "./responseResourceSchema.ts";
 export { responsesToolParamSchema } from "./responsesToolParamSchema.ts";
-export { serviceTierEnumSchema } from "./serviceTierEnumSchema.ts";
 export { specificFunctionParamSchema } from "./specificFunctionParamSchema.ts";
 export { specificToolChoiceParamSchema } from "./specificToolChoiceParamSchema.ts";
 export { streamOptionsParamSchema } from "./streamOptionsParamSchema.ts";

@@ -4,7 +4,7 @@
  */
 
 import { allowedToolsParamSchema } from "./allowedToolsParamSchema.ts";
-import { specificToolChoiceParamSchema } from "./specificToolChoiceParamSchema.ts";
+import { specificFunctionParamSchema } from "./specificFunctionParamSchema.ts";
 import { toolChoiceValueEnumSchema } from "./toolChoiceValueEnumSchema.ts";
 import { z } from "zod";
 
@@ -13,7 +13,7 @@ import { z } from "zod";
  */
 export const toolChoiceParamSchema = z
   .union([
-    z.lazy(() => specificToolChoiceParamSchema),
+    z.lazy(() => specificFunctionParamSchema),
     z.lazy(() => toolChoiceValueEnumSchema),
     z.lazy(() => allowedToolsParamSchema),
   ])

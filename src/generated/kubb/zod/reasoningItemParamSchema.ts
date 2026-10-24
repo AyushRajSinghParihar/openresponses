@@ -7,7 +7,11 @@ import { reasoningSummaryContentParamSchema } from "./reasoningSummaryContentPar
 import { z } from "zod";
 
 export const reasoningItemParamSchema = z.object({
-  id: z.optional(z.union([z.string(), z.null()])),
+  id: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe("The unique ID of this reasoning item."),
+  ),
   type: z
     .enum(["reasoning"])
     .default("reasoning")
@@ -16,5 +20,9 @@ export const reasoningItemParamSchema = z.object({
     .array(z.lazy(() => reasoningSummaryContentParamSchema))
     .describe("Reasoning summary content associated with this item."),
   content: z.optional(z.null()),
-  encrypted_content: z.optional(z.union([z.string(), z.null()])),
+  encrypted_content: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe("An encrypted representation of the reasoning content."),
+  ),
 });

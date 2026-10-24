@@ -26,8 +26,18 @@ export const messageSchema = z
       .default("message")
       .describe("The type of the message. Always set to `message`."),
     id: z.string().describe("The unique ID of the message."),
-    status: z.lazy(() => messageStatusSchema).and(z.any()),
-    role: z.lazy(() => messageRoleSchema).and(z.any()),
+    status: z
+      .lazy(() => messageStatusSchema)
+      .and(z.unknown())
+      .describe(
+        "The status of item. One of `in_progress`, `completed`, or `incomplete`. Populated\nwhen items are returned via API.",
+      ),
+    role: z
+      .lazy(() => messageRoleSchema)
+      .and(z.unknown())
+      .describe(
+        "The role of the message. One of `unknown`, `user`, `assistant`, `system`, `critic`,\n`discriminator`, `developer`, or `tool`.",
+      ),
     content: z
       .array(
         z
@@ -49,7 +59,7 @@ export const messageSchema = z
       z
         .enum(["commentary", "final_answer"])
         .describe(
-          "Labels an `assistant` message as intermediate commentary (`commentary`) or the final answer (`final_answer`). For models like `gpt-5.3-codex` and beyond, when sending follow-up requests, preserve and resend phase on all assistant messages. Omitting it can degrade performance. Not used for user messages.",
+          "Labels an `assistant` message as intermediate commentary (`commentary`) or the\nfinal answer (`final_answer`). For models like `gpt-5.3-codex` and beyond, when\nsending follow-up requests, preserve and resend phase on all assistant messages.\nOmitting it can degrade performance. Not used for user messages.",
         ),
     ),
   })

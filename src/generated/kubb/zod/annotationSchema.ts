@@ -11,4 +11,4 @@ import { z } from "zod";
  */
 export const annotationSchema = z
   .lazy(() => urlCitationBodySchema)
-  .describe("An annotation that applies to a span of output text.");
+  .describe("A citation for a web resource used to generate a model response.");

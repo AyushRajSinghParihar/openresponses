@@ -11,4 +11,6 @@ import { z } from "zod";
  */
 export const toolSchema = z
   .lazy(() => functionToolSchema)
-  .describe("A tool that can be used to generate a response.");
+  .describe(
+    "Defines a function in your own code the model can choose to call. Learn more about\n[function calling](https://platform.openai.com/docs/guides/function-calling).",
+  );

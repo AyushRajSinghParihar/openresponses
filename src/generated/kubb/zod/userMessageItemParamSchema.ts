@@ -9,7 +9,11 @@ import { inputTextContentParamSchema } from "./inputTextContentParamSchema.ts";
 import { z } from "zod";
 
 export const userMessageItemParamSchema = z.object({
-  id: z.optional(z.union([z.string(), z.null()])),
+  id: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe("The unique ID of this message item."),
+  ),
   type: z
     .enum(["message"])
     .default("message")
@@ -33,6 +37,8 @@ export const userMessageItemParamSchema = z.object({
       ),
       z.string(),
     ])
-    .describe("The message content, as an array of content parts."),
-  status: z.optional(z.union([z.string(), z.null()])),
+    .describe("The message content, as a string or an array of content parts."),
+  status: z.optional(
+    z.union([z.string(), z.null()]).describe("The status of the message item."),
+  ),
 });

@@ -12,11 +12,22 @@ import { z } from "zod";
  */
 export const reasoningSchema = z
   .object({
-    effort: z.union([z.lazy(() => reasoningEffortEnumSchema), z.null()]),
-    summary: z.union([
-      z.lazy(() => reasoningSummaryEnumSchema).and(z.any()),
-      z.null(),
-    ]),
+    effort: z
+      .union([
+        z.lazy(() => reasoningEffortEnumSchema).and(z.unknown()),
+        z.null(),
+      ])
+      .describe(
+        "The reasoning effort that was requested for the model, if specified.",
+      ),
+    summary: z
+      .union([
+        z.lazy(() => reasoningSummaryEnumSchema).and(z.unknown()),
+        z.null(),
+      ])
+      .describe(
+        "A model-generated summary of its reasoning that was produced, if available.",
+      ),
   })
   .describe(
     "Reasoning configuration and metadata that were used for the response.",

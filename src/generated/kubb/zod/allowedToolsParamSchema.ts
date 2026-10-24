@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { specificToolChoiceParamSchema } from "./specificToolChoiceParamSchema.ts";
+import { specificFunctionParamSchema } from "./specificFunctionParamSchema.ts";
 import { toolChoiceValueEnumSchema } from "./toolChoiceValueEnumSchema.ts";
 import { z } from "zod";
 
@@ -13,9 +13,14 @@ export const allowedToolsParamSchema = z.object({
     .default("allowed_tools")
     .describe("The tool choice type. Always `allowed_tools`."),
   tools: z
-    .array(z.lazy(() => specificToolChoiceParamSchema))
+    .array(z.lazy(() => specificFunctionParamSchema))
     .min(1)
     .max(128)
     .describe("The list of tools that are permitted for this request."),
-  mode: z.optional(z.lazy(() => toolChoiceValueEnumSchema).and(z.any())),
+  mode: z.optional(
+    z
+      .lazy(() => toolChoiceValueEnumSchema)
+      .and(z.unknown())
+      .describe("How to select a tool from the allowed set."),
+  ),
 });

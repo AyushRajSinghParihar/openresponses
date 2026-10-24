@@ -7,7 +7,11 @@ import { functionCallStatusSchema } from "./functionCallStatusSchema.ts";
 import { z } from "zod";
 
 export const functionCallItemParamSchema = z.object({
-  id: z.optional(z.union([z.string(), z.null()])),
+  id: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe("The unique ID of this function tool call."),
+  ),
   call_id: z
     .string()
     .min(1)
@@ -27,6 +31,11 @@ export const functionCallItemParamSchema = z.object({
     .describe("The name of the function to call."),
   arguments: z.string().describe("The function arguments as a JSON string."),
   status: z.optional(
-    z.union([z.lazy(() => functionCallStatusSchema).and(z.any()), z.null()]),
+    z
+      .union([
+        z.lazy(() => functionCallStatusSchema).and(z.unknown()),
+        z.null(),
+      ])
+      .describe("The status of the function tool call."),
   ),
 });

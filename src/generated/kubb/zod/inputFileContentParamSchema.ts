@@ -14,8 +14,22 @@ export const inputFileContentParamSchema = z
       .enum(["input_file"])
       .default("input_file")
       .describe("The type of the input item. Always `input_file`."),
-    filename: z.optional(z.union([z.string(), z.null()])),
-    file_data: z.optional(z.union([z.string(), z.null()])),
-    file_url: z.optional(z.union([z.string(), z.null()])),
+    filename: z.optional(
+      z
+        .union([z.string(), z.null()])
+        .describe("The name of the file to be sent to the model."),
+    ),
+    file_data: z.optional(
+      z
+        .union([z.string(), z.null()])
+        .describe(
+          "The base64-encoded data of the file to be sent to the model.",
+        ),
+    ),
+    file_url: z.optional(
+      z
+        .union([z.string(), z.null()])
+        .describe("The URL of the file to be sent to the model."),
+    ),
   })
   .describe("A file input to the model.");

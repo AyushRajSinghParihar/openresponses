@@ -3,12 +3,11 @@
  * Do not edit manually.
  */
 
+import { functionToolParamSchema } from "./functionToolParamSchema.ts";
 import { includeEnumSchema } from "./includeEnumSchema.ts";
 import { itemParamSchema } from "./itemParamSchema.ts";
 import { metadataParamSchema } from "./metadataParamSchema.ts";
 import { reasoningParamSchema } from "./reasoningParamSchema.ts";
-import { responsesToolParamSchema } from "./responsesToolParamSchema.ts";
-import { serviceTierEnumSchema } from "./serviceTierEnumSchema.ts";
 import { streamOptionsParamSchema } from "./streamOptionsParamSchema.ts";
 import { textParamSchema } from "./textParamSchema.ts";
 import { toolChoiceParamSchema } from "./toolChoiceParamSchema.ts";
@@ -16,39 +15,98 @@ import { truncationEnumSchema } from "./truncationEnumSchema.ts";
 import { z } from "zod";
 
 export const createResponseBodySchema = z.object({
-  model: z.optional(z.union([z.string(), z.null()])),
-  input: z.optional(
-    z.union([
-      z.union([z.array(z.lazy(() => itemParamSchema)), z.string()]),
-      z.null(),
-    ]),
+  model: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe("The model to use for this request, e.g. 'gpt-5.2'."),
   ),
-  previous_response_id: z.optional(z.union([z.string(), z.null()])),
+  input: z.optional(
+    z
+      .union([
+        z.union([z.array(z.lazy(() => itemParamSchema)), z.string()]),
+        z.null(),
+      ])
+      .describe(
+        "Context to provide to the model for the scope of this request. May either be a\nstring or an array of input items. If a string is provided, it is interpreted as a\nuser message.",
+      ),
+  ),
+  previous_response_id: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe(
+        "The ID of the response to use as the prior turn for this request.",
+      ),
+  ),
   include: z.optional(z.array(z.lazy(() => includeEnumSchema))),
   tools: z.optional(
-    z.union([z.array(z.lazy(() => responsesToolParamSchema)), z.null()]),
+    z
+      .union([z.array(z.lazy(() => functionToolParamSchema)), z.null()])
+      .describe(
+        "A list of tools that the model may call while generating the response.",
+      ),
   ),
   tool_choice: z.optional(
-    z.union([z.lazy(() => toolChoiceParamSchema).and(z.any()), z.null()]),
+    z
+      .union([z.lazy(() => toolChoiceParamSchema).and(z.unknown()), z.null()])
+      .describe("Controls which tool the model should use, if any."),
   ),
   metadata: z.optional(
-    z.union([z.lazy(() => metadataParamSchema).and(z.any()), z.null()]),
+    z
+      .union([z.lazy(() => metadataParamSchema).and(z.unknown()), z.null()])
+      .describe(
+        "Set of 16 key-value pairs that can be attached to an object. This can be useful for\nstoring additional information about the object in a structured format, and\nquerying for objects via API or the dashboard. Keys are strings with a maximum\nlength of 64 characters. Values are strings with a maximum length of 512\ncharacters.",
+      ),
   ),
   text: z.optional(
-    z.union([z.lazy(() => textParamSchema).and(z.any()), z.null()]),
+    z
+      .union([z.lazy(() => textParamSchema).and(z.unknown()), z.null()])
+      .describe("Configuration options for text output."),
   ),
-  temperature: z.optional(z.union([z.number(), z.null()])),
-  top_p: z.optional(z.union([z.number(), z.null()])),
-  presence_penalty: z.optional(z.union([z.number(), z.null()])),
-  frequency_penalty: z.optional(z.union([z.number(), z.null()])),
-  parallel_tool_calls: z.optional(z.union([z.boolean(), z.null()])),
+  temperature: z.optional(
+    z
+      .union([z.number(), z.null()])
+      .describe(
+        "Sampling temperature to use, between 0 and 2. Higher values make the output more\nrandom.",
+      ),
+  ),
+  top_p: z.optional(
+    z
+      .union([z.number(), z.null()])
+      .describe(
+        "Nucleus sampling parameter, between 0 and 1. The model considers only the tokens\nwith the top cumulative probability.",
+      ),
+  ),
+  presence_penalty: z.optional(
+    z
+      .union([z.number(), z.null()])
+      .describe(
+        "Penalizes new tokens based on whether they appear in the text so far.",
+      ),
+  ),
+  frequency_penalty: z.optional(
+    z
+      .union([z.number(), z.null()])
+      .describe(
+        "Penalizes new tokens based on their frequency in the text so far.",
+      ),
+  ),
+  parallel_tool_calls: z.optional(
+    z
+      .union([z.boolean(), z.null()])
+      .describe("Whether the model may call multiple tools in parallel."),
+  ),
   stream: z.optional(
     z
       .boolean()
       .describe("Whether to stream response events as server-sent events."),
   ),
   stream_options: z.optional(
-    z.union([z.lazy(() => streamOptionsParamSchema).and(z.any()), z.null()]),
+    z
+      .union([
+        z.lazy(() => streamOptionsParamSchema).and(z.unknown()),
+        z.null(),
+      ])
+      .describe("Options that control streamed response behavior."),
   ),
   background: z.optional(
     z
@@ -57,20 +115,65 @@ export const createResponseBodySchema = z.object({
         "Whether to run the request in the background and return immediately.",
       ),
   ),
-  max_output_tokens: z.optional(z.union([z.number().int(), z.null()])),
-  max_tool_calls: z.optional(z.union([z.number().int(), z.null()])),
-  reasoning: z.optional(
-    z.union([z.lazy(() => reasoningParamSchema).and(z.any()), z.null()]),
+  max_output_tokens: z.optional(
+    z
+      .union([z.number().int(), z.null()])
+      .describe(
+        "The maximum number of tokens the model may generate for this response.",
+      ),
   ),
-  safety_identifier: z.optional(z.union([z.string(), z.null()])),
-  prompt_cache_key: z.optional(z.union([z.string(), z.null()])),
-  truncation: z.optional(z.lazy(() => truncationEnumSchema).and(z.any())),
-  instructions: z.optional(z.union([z.string(), z.null()])),
+  max_tool_calls: z.optional(
+    z
+      .union([z.number().int(), z.null()])
+      .describe(
+        "The maximum number of tool calls the model may make while generating the response.",
+      ),
+  ),
+  reasoning: z.optional(
+    z
+      .union([z.lazy(() => reasoningParamSchema).and(z.unknown()), z.null()])
+      .describe("Configuration options for reasoning behavior."),
+  ),
+  safety_identifier: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe(
+        "A stable identifier used for safety monitoring and abuse detection.",
+      ),
+  ),
+  prompt_cache_key: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe(
+        "A key to use when reading from or writing to the prompt cache.",
+      ),
+  ),
+  truncation: z.optional(
+    z
+      .lazy(() => truncationEnumSchema)
+      .and(z.unknown())
+      .describe(
+        "Controls how the service truncates the input when it exceeds the model context\nwindow.",
+      ),
+  ),
+  instructions: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe("Additional instructions to guide the model for this request."),
+  ),
   store: z.optional(
     z
       .boolean()
       .describe("Whether to store the response so it can be retrieved later."),
   ),
-  service_tier: z.optional(z.lazy(() => serviceTierEnumSchema).and(z.any())),
-  top_logprobs: z.optional(z.union([z.number().int(), z.null()])),
+  service_tier: z.optional(
+    z.string().describe("The service tier to use for this request."),
+  ),
+  top_logprobs: z.optional(
+    z
+      .union([z.number().int(), z.null()])
+      .describe(
+        "The number of most likely tokens to return at each position, along with their log\nprobabilities.",
+      ),
+  ),
 });

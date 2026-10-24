@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { annotationSchema } from "./annotationSchema.ts";
 import { logProbSchema } from "./logProbSchema.ts";
+import { urlCitationBodySchema } from "./urlCitationBodySchema.ts";
 import { z } from "zod";
 
 /**
@@ -20,8 +20,10 @@ export const outputTextContentSchema = z
     annotations: z
       .array(
         z
-          .lazy(() => annotationSchema)
-          .describe("An annotation that applies to a span of output text."),
+          .lazy(() => urlCitationBodySchema)
+          .describe(
+            "A citation for a web resource used to generate a model response.",
+          ),
       )
       .describe("The annotations of the text output."),
     logprobs: z.optional(

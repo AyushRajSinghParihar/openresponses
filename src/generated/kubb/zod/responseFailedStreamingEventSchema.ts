@@ -19,6 +19,11 @@ export const responseFailedStreamingEventSchema = z
       .number()
       .int()
       .describe("The sequence number of the event that was emitted."),
-    response: z.lazy(() => responseResourceSchema).and(z.any()),
+    response: z
+      .lazy(() => responseResourceSchema)
+      .and(z.unknown())
+      .describe(
+        "The complete response object that was returned by the Responses API.",
+      ),
   })
   .describe("A streaming event that indicated the response had failed.");

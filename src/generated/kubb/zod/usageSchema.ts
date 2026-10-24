@@ -28,7 +28,13 @@ export const usageSchema = z
       .number()
       .int()
       .describe("The total number of tokens that were used."),
-    input_tokens_details: z.lazy(() => inputTokensDetailsSchema).and(z.any()),
-    output_tokens_details: z.lazy(() => outputTokensDetailsSchema).and(z.any()),
+    input_tokens_details: z
+      .lazy(() => inputTokensDetailsSchema)
+      .and(z.unknown())
+      .describe("A breakdown of input token usage that was recorded."),
+    output_tokens_details: z
+      .lazy(() => outputTokensDetailsSchema)
+      .and(z.unknown())
+      .describe("A breakdown of output token usage that was recorded."),
   })
   .describe("Token usage statistics that were recorded for the response.");

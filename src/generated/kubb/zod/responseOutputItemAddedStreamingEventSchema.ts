@@ -23,7 +23,11 @@ export const responseOutputItemAddedStreamingEventSchema = z
       .number()
       .int()
       .describe("The index of the output item that was added."),
-    item: z.union([z.lazy(() => itemFieldSchema).and(z.any()), z.null()]),
+    item: z
+      .union([z.lazy(() => itemFieldSchema).and(z.unknown()), z.null()])
+      .describe(
+        "An item representing a message, tool call, tool output, reasoning, or other\nresponse element.",
+      ),
   })
   .describe(
     "A streaming event that indicated an output item was added to the response.",

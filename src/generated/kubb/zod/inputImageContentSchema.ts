@@ -15,8 +15,17 @@ export const inputImageContentSchema = z
       .enum(["input_image"])
       .default("input_image")
       .describe("The type of the input item. Always `input_image`."),
-    image_url: z.union([z.string(), z.null()]),
-    detail: z.lazy(() => imageDetailSchema).and(z.any()),
+    image_url: z
+      .union([z.string(), z.null()])
+      .describe(
+        "The URL of the image to be sent to the model. A fully qualified URL or base64\nencoded image in a data URL.",
+      ),
+    detail: z
+      .lazy(() => imageDetailSchema)
+      .and(z.unknown())
+      .describe(
+        "The detail level of the image to be sent to the model. One of `high`, `low`, or\n`auto`. Defaults to `auto`.",
+      ),
   })
   .describe(
     "An image input to the model. Learn about [image inputs](/docs/guides/vision).",

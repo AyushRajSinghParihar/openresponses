@@ -19,6 +19,11 @@ export const errorStreamingEventSchema = z
       .number()
       .int()
       .describe("The sequence number of the event that was emitted."),
-    error: z.lazy(() => errorPayloadSchema).and(z.any()),
+    error: z
+      .lazy(() => errorPayloadSchema)
+      .and(z.unknown())
+      .describe(
+        "An error payload that was emitted for a streaming error event.",
+      ),
   })
   .describe("A streaming event that indicated an error was emitted.");

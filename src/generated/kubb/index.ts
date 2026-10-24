@@ -93,7 +93,6 @@ export { responseRefusalDeltaStreamingEventSchema } from "./zod/responseRefusalD
 export { responseRefusalDoneStreamingEventSchema } from "./zod/responseRefusalDoneStreamingEventSchema.ts";
 export { responseResourceSchema } from "./zod/responseResourceSchema.ts";
 export { responsesToolParamSchema } from "./zod/responsesToolParamSchema.ts";
-export { serviceTierEnumSchema } from "./zod/serviceTierEnumSchema.ts";
 export { specificFunctionParamSchema } from "./zod/specificFunctionParamSchema.ts";
 export { specificToolChoiceParamSchema } from "./zod/specificToolChoiceParamSchema.ts";
 export { streamOptionsParamSchema } from "./zod/streamOptionsParamSchema.ts";

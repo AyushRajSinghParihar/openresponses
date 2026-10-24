@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { annotationSchema } from "./annotationSchema.ts";
+import { urlCitationBodySchema } from "./urlCitationBodySchema.ts";
 import { z } from "zod";
 
 /**
@@ -34,10 +34,9 @@ export const responseOutputTextAnnotationAddedStreamingEventSchema = z
       .number()
       .int()
       .describe("The index of the annotation that was added."),
-    annotation: z.union([
-      z.lazy(() => annotationSchema).and(z.any()),
-      z.null(),
-    ]),
+    annotation: z
+      .union([z.lazy(() => urlCitationBodySchema).and(z.unknown()), z.null()])
+      .describe("An annotation that applies to a span of output text."),
   })
   .describe(
     "A streaming event that indicated an output text annotation was added.",

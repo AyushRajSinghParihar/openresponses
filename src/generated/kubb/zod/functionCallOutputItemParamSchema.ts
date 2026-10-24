@@ -15,7 +15,13 @@ import { z } from "zod";
  */
 export const functionCallOutputItemParamSchema = z
   .object({
-    id: z.optional(z.union([z.string(), z.null()])),
+    id: z.optional(
+      z
+        .union([z.string(), z.null()])
+        .describe(
+          "The unique ID of the function tool call output. Populated when this item is\nreturned via API.",
+        ),
+    ),
     call_id: z
       .string()
       .min(1)
@@ -45,9 +51,18 @@ export const functionCallOutputItemParamSchema = z
         ),
         z.string(),
       ])
-      .describe("Text, image, or file output of the function tool call."),
+      .describe(
+        "The function tool call output, as a JSON string or an array of text, image,\nor file content.",
+      ),
     status: z.optional(
-      z.union([z.lazy(() => functionCallStatusSchema).and(z.any()), z.null()]),
+      z
+        .union([
+          z.lazy(() => functionCallStatusSchema).and(z.unknown()),
+          z.null(),
+        ])
+        .describe(
+          "The status of the item. One of `in_progress`, `completed`, or `incomplete`.\nPopulated when items are returned via API.",
+        ),
     ),
   })
   .describe("The output of a function tool call.");

@@ -11,7 +11,7 @@ import { reasoningBodySchema } from "./reasoningBodySchema.ts";
 import { z } from "zod";
 
 /**
- * @description An item representing a message, tool call, tool output, reasoning, or other response element.
+ * @description An item representing a message, tool call, tool output, reasoning, or other response\nelement.
  */
 export const itemFieldSchema = z
   .union([
@@ -22,5 +22,5 @@ export const itemFieldSchema = z
     z.lazy(() => compactionBodySchema),
   ])
   .describe(
-    "An item representing a message, tool call, tool output, reasoning, or other response element.",
+    "An item representing a message, tool call, tool output, reasoning, or other response\nelement.",
   );

@@ -99,7 +99,7 @@ model CreateResponseBody {
   store?: boolean;
 
   /** The service tier to use for this request. */
-  service_tier?: ServiceTierEnum;
+  service_tier?: ServiceTierParam;
 
   /**
    * The number of most likely tokens to return at each position, along with their log
@@ -311,7 +311,7 @@ model ResponseResource {
   background: boolean;
 
   /** The service tier that was used for this response. */
-  service_tier: string;
+  service_tier: string | null;
 
   /** Developer-defined metadata that was associated with the response. */
   metadata: unknown;

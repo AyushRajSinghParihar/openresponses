@@ -7,7 +7,7 @@ import { createResponseBodySchema } from "./createResponseBodySchema.ts";
 import { z } from "zod";
 
 /**
- * @description A client-sent WebSocket event that starts a Responses turn. It uses the normal response-create body plus a required `type` field.
+ * @description A client-sent WebSocket event that starts a Responses turn. It uses the normal\nresponse-create body plus a required `type` field.
  */
 export const webSocketResponseCreateEventSchema = z
   .lazy(() => createResponseBodySchema)
@@ -32,7 +32,7 @@ export const webSocketResponseCreateEventSchema = z
           .min(1)
           .max(0)
           .describe(
-            "This HTTP streaming options field MUST NOT be sent in WebSocket `response.create` messages.",
+            "This HTTP streaming options field MUST NOT be sent in WebSocket `response.create`\nmessages.",
           ),
       ),
       background: z.optional(
@@ -41,11 +41,11 @@ export const webSocketResponseCreateEventSchema = z
           .min(1)
           .max(0)
           .describe(
-            "This HTTP background-mode field MUST NOT be sent in WebSocket `response.create` messages.",
+            "This HTTP background-mode field MUST NOT be sent in WebSocket `response.create`\nmessages.",
           ),
       ),
     }),
   )
   .describe(
-    "A client-sent WebSocket event that starts a Responses turn. It uses the normal response-create body plus a required `type` field.",
+    "A client-sent WebSocket event that starts a Responses turn. It uses the normal\nresponse-create body plus a required `type` field.",
   );
