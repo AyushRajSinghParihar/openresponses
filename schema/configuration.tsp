@@ -114,21 +114,13 @@ enum TruncationEnum {
   disabled,
 }
 
-@extension(
-  "x-enumDescriptions",
-  #{
-    auto: "Choose a service tier automatically based on current account state.",
-    default: "Choose the default service tier.",
-    flex: "Choose the flex service tier.",
-    priority: "Choose the priority service tier.",
-  }
-)
-enum ServiceTierEnum {
-  auto,
-  default,
-  flex,
-  priority,
-}
+/**
+ * A provider-defined service tier identifier for this request. Servers may expose
+ * multiple tiers (such as "standard", "priority", or "batch") and map them to
+ * different internal queues, SLAs, or pricing. Implementations should document which
+ * tiers they support and what behavior each tier implies.
+ */
+alias ServiceTierParam = string;
 
 model TextResponseFormat {
   type: "text" = "text";

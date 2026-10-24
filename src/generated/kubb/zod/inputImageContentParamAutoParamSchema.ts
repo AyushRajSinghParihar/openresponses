@@ -15,9 +15,19 @@ export const inputImageContentParamAutoParamSchema = z
       .enum(["input_image"])
       .default("input_image")
       .describe("The type of the input item. Always `input_image`."),
-    image_url: z.optional(z.union([z.string(), z.null()])),
+    image_url: z.optional(
+      z
+        .union([z.string(), z.null()])
+        .describe(
+          "The URL of the image to be sent to the model. A fully qualified URL or base64\nencoded image in a data URL.",
+        ),
+    ),
     detail: z.optional(
-      z.union([z.lazy(() => imageDetailSchema).and(z.any()), z.null()]),
+      z
+        .union([z.lazy(() => imageDetailSchema).and(z.unknown()), z.null()])
+        .describe(
+          "The detail level of the image to be sent to the model. One of `high`, `low`, or\n`auto`. Defaults to `auto`.",
+        ),
     ),
   })
   .describe(

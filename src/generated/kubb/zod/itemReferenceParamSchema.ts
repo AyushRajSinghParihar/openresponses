@@ -10,7 +10,11 @@ import { z } from "zod";
  */
 export const itemReferenceParamSchema = z
   .object({
-    type: z.optional(z.union([z.enum(["item_reference"]), z.null()])),
+    type: z.optional(
+      z
+        .union([z.enum(["item_reference"]), z.null()])
+        .describe("The type of item to reference. Always `item_reference`."),
+    ),
     id: z.string().describe("The ID of the item to reference."),
   })
   .describe("An internal identifier for an item to reference.");

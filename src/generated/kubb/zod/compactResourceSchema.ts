@@ -18,7 +18,7 @@ export const compactResourceSchema = z.object({
       z
         .lazy(() => itemFieldSchema)
         .describe(
-          "An item representing a message, tool call, tool output, reasoning, or other response element.",
+          "An item representing a message, tool call, tool output, reasoning, or other response\nelement.",
         ),
     )
     .describe("The compacted list of output items."),
@@ -28,5 +28,8 @@ export const compactResourceSchema = z.object({
     .describe(
       "Unix timestamp (in seconds) when the compacted conversation was created.",
     ),
-  usage: z.lazy(() => usageSchema).and(z.any()),
+  usage: z
+    .lazy(() => usageSchema)
+    .and(z.unknown())
+    .describe("Token usage statistics that were recorded for the response."),
 });

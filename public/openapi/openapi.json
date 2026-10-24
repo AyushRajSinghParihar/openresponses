@@ -1335,7 +1335,14 @@
             "description": "Whether this request was run in the background."
           },
           "service_tier": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "description": "The service tier that was used for this response."
           },
           "metadata": {
@@ -3394,16 +3401,6 @@
         },
         "description": "**gpt-5 and o-series models only** Configuration options for [reasoning\nmodels](https://platform.openai.com/docs/guides/reasoning)."
       },
-      "ServiceTierEnum": {
-        "type": "string",
-        "enum": ["auto", "default", "flex", "priority"],
-        "x-enumDescriptions": {
-          "auto": "Choose a service tier automatically based on current account state.",
-          "default": "Choose the default service tier.",
-          "flex": "Choose the flex service tier.",
-          "priority": "Choose the priority service tier."
-        }
-      },
       "CreateResponseBody": {
         "type": "object",
         "properties": {
@@ -3659,7 +3656,7 @@
             "description": "Whether to store the response so it can be retrieved later."
           },
           "service_tier": {
-            "$ref": "#/components/schemas/ServiceTierEnum",
+            "type": "string",
             "description": "The service tier to use for this request."
           },
           "top_logprobs": {

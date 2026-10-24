@@ -6,7 +6,7 @@
 import { z } from "zod";
 
 /**
- * @description Defines a function in your own code the model can choose to call. Learn more about [function calling](https://platform.openai.com/docs/guides/function-calling).
+ * @description Defines a function in your own code the model can choose to call. Learn more about\n[function calling](https://platform.openai.com/docs/guides/function-calling).
  */
 export const functionToolSchema = z
   .object({
@@ -15,10 +15,22 @@ export const functionToolSchema = z
       .default("function")
       .describe("The type of the function tool. Always `function`."),
     name: z.string().describe("The name of the function to call."),
-    description: z.union([z.string(), z.null()]),
-    parameters: z.union([z.object({}).catchall(z.any()), z.null()]),
-    strict: z.union([z.boolean(), z.null()]),
+    description: z
+      .union([z.string(), z.null()])
+      .describe(
+        "A description of the function. Used by the model to determine whether or not to\ncall the function.",
+      ),
+    parameters: z
+      .union([z.object({}).catchall(z.any()), z.null()])
+      .describe(
+        "A JSON schema object describing the parameters of the function.",
+      ),
+    strict: z
+      .union([z.boolean(), z.null()])
+      .describe(
+        "Whether to enforce strict parameter validation. Default `true`.",
+      ),
   })
   .describe(
-    "Defines a function in your own code the model can choose to call. Learn more about [function calling](https://platform.openai.com/docs/guides/function-calling).",
+    "Defines a function in your own code the model can choose to call. Learn more about\n[function calling](https://platform.openai.com/docs/guides/function-calling).",
   );

@@ -23,7 +23,13 @@ export const webSocketErrorEventSchema = z
         type: z.optional(z.string().describe("The error type, when supplied.")),
         code: z.string().describe("A machine-readable error code."),
         message: z.string().describe("A human-readable error message."),
-        param: z.optional(z.union([z.string(), z.null()])),
+        param: z.optional(
+          z
+            .union([z.string(), z.null()])
+            .describe(
+              "The request parameter associated with the error, when supplied.",
+            ),
+        ),
       })
       .catchall(z.any())
       .describe("The WebSocket error payload."),

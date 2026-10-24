@@ -23,6 +23,10 @@ export const responseOutputItemDoneStreamingEventSchema = z
       .number()
       .int()
       .describe("The index of the output item that was completed."),
-    item: z.union([z.lazy(() => itemFieldSchema).and(z.any()), z.null()]),
+    item: z
+      .union([z.lazy(() => itemFieldSchema).and(z.unknown()), z.null()])
+      .describe(
+        "An item representing a message, tool call, tool output, reasoning, or other\nresponse element.",
+      ),
   })
   .describe("A streaming event that indicated an output item was completed.");

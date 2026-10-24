@@ -10,15 +10,37 @@ export const compactResponseMethodPublicBodySchema = z.object({
   model: z
     .string()
     .describe(
-      "Model ID used to generate the response, like `gpt-5` or `o3`. OpenAI offers a wide range of models with different capabilities, performance characteristics, and price points. Refer to the [model guide](/docs/models) to browse and compare available models.",
+      "Model ID used to generate the response, like `gpt-5` or `o3`. OpenAI offers a wide\nrange of models with different capabilities, performance characteristics, and price\npoints. Refer to the [model guide](/docs/models) to browse and compare available\nmodels.",
     ),
   input: z.optional(
-    z.union([
-      z.union([z.array(z.lazy(() => itemParamSchema)), z.string()]),
-      z.null(),
-    ]),
+    z
+      .union([
+        z.union([z.array(z.lazy(() => itemParamSchema)), z.string()]),
+        z.null(),
+      ])
+      .describe(
+        "Text, image, or file inputs to the model, used to generate a response.\nA string is treated as text input with the `user` role. An array can contain\none or more input items with different content types.",
+      ),
   ),
-  previous_response_id: z.optional(z.union([z.string(), z.null()])),
-  instructions: z.optional(z.union([z.string(), z.null()])),
-  prompt_cache_key: z.optional(z.union([z.string(), z.null()])),
+  previous_response_id: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe(
+        "The unique ID of the previous response to the model. Use this to create multi-turn\nconversations. Learn more about [conversation\nstate](/docs/guides/conversation-state). Cannot be used in conjunction with\n`conversation`.",
+      ),
+  ),
+  instructions: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe(
+        "A system (or developer) message inserted into the model's context. When used along\nwith `previous_response_id`, the instructions from a previous response will not be\ncarried over to the next response. This makes it simple to swap out system (or\ndeveloper) messages in new responses.",
+      ),
+  ),
+  prompt_cache_key: z.optional(
+    z
+      .union([z.string(), z.null()])
+      .describe(
+        "A key to use when reading from or writing to the prompt cache.",
+      ),
+  ),
 });

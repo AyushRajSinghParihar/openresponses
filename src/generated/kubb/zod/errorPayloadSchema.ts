@@ -11,15 +11,21 @@ import { z } from "zod";
 export const errorPayloadSchema = z
   .object({
     type: z.string().describe("The error type that was emitted."),
-    code: z.union([z.string(), z.null()]),
+    code: z
+      .union([z.string(), z.null()])
+      .describe("The error code that was emitted, if any."),
     message: z
       .string()
       .describe("The human-readable error message that was emitted."),
-    param: z.union([z.string(), z.null()]),
+    param: z
+      .union([z.string(), z.null()])
+      .describe(
+        "The parameter name that was associated with the error, if any.",
+      ),
     headers: z.optional(
       z
         .object({})
-        .catchall(z.string().describe("The header value that was emitted."))
+        .catchall(z.string())
         .describe(
           "The response headers that were emitted with the error, if any.",
         ),

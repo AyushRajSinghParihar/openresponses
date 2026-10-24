@@ -13,5 +13,10 @@ export const textParamSchema = z.object({
       .union([z.lazy(() => textFormatParamSchema), z.null()])
       .describe("The format configuration for text output."),
   ),
-  verbosity: z.optional(z.lazy(() => verbosityEnumSchema).and(z.any())),
+  verbosity: z.optional(
+    z
+      .lazy(() => verbosityEnumSchema)
+      .and(z.unknown())
+      .describe("Controls the level of detail in generated text output."),
+  ),
 });

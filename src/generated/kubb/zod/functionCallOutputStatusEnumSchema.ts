@@ -6,10 +6,10 @@
 import { z } from "zod";
 
 /**
- * @description Similar to `FunctionCallStatus`. All three options are allowed here for compatibility, but because in practice these items will be provided by developers, only `completed` should be used.
+ * @description Similar to `FunctionCallStatus`. All three options are allowed here for\ncompatibility, but because in practice these items will be provided by developers,\nonly `completed` should be used.
  */
 export const functionCallOutputStatusEnumSchema = z
   .enum(["in_progress", "completed", "incomplete"])
   .describe(
-    "Similar to `FunctionCallStatus`. All three options are allowed here for compatibility, but because in practice these items will be provided by developers, only `completed` should be used.",
+    "Similar to `FunctionCallStatus`. All three options are allowed here for\ncompatibility, but because in practice these items will be provided by developers,\nonly `completed` should be used.",
   );

@@ -8,20 +8,31 @@ import { reasoningSummaryEnumSchema } from "./reasoningSummaryEnumSchema.ts";
 import { z } from "zod";
 
 /**
- * @description **gpt-5 and o-series models only** Configuration options for [reasoning models](https://platform.openai.com/docs/guides/reasoning).
+ * @description **gpt-5 and o-series models only** Configuration options for [reasoning\nmodels](https://platform.openai.com/docs/guides/reasoning).
  */
 export const reasoningParamSchema = z
   .object({
     effort: z.optional(
-      z.union([z.lazy(() => reasoningEffortEnumSchema), z.null()]),
+      z
+        .union([
+          z.lazy(() => reasoningEffortEnumSchema).and(z.unknown()),
+          z.null(),
+        ])
+        .describe(
+          "Controls the level of reasoning effort the model should apply. Higher effort may\nincrease latency and cost.",
+        ),
     ),
     summary: z.optional(
-      z.union([
-        z.lazy(() => reasoningSummaryEnumSchema).and(z.any()),
-        z.null(),
-      ]),
+      z
+        .union([
+          z.lazy(() => reasoningSummaryEnumSchema).and(z.unknown()),
+          z.null(),
+        ])
+        .describe(
+          "Controls whether the response includes a reasoning summary.",
+        ),
     ),
   })
   .describe(
-    "**gpt-5 and o-series models only** Configuration options for [reasoning models](https://platform.openai.com/docs/guides/reasoning).",
+    "**gpt-5 and o-series models only** Configuration options for [reasoning\nmodels](https://platform.openai.com/docs/guides/reasoning).",
   );
